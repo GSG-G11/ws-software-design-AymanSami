@@ -17,24 +17,30 @@
  * |          |     |                |   |      |  |             |
  * | protocol |     |    domain      |   | path |  | querystring |
  */
-var UrlParser = (function () {
-  // fill in ...
+let UrlParser = (function () {
+  function extractUrlSection(url, n) {
+    return url.match(/(http?s):\/\/(.*)\/(.*)\?(.*)/)[n]
+  }
 
   return {
     // a function that takes a URL and returns its protocol
-    protocol: null,
-
+    protocol: function(url) {
+      return extractUrlSection(url, 1)
+    },
     // a function that takes a URL and returns its domain
-    domain: null,
-
+    domain: function(url) {
+      return extractUrlSection(url, 2)
+    },
     // a function that takes a URL and returns its path
-    path: null,
-
+    path: function(url) {
+      return extractUrlSection(url, 3)
+    },
     // a function that takes a URL and returns its query string
-    querystring: null,
+    querystring: function(url) {
+      return extractUrlSection(url, 4)
+    },
   };
-});
-
+})();
 
 /*
  * Create a module that can support multiple instances (like in our example).
@@ -51,14 +57,17 @@ var UrlParser = (function () {
  * exampleBuilder.
  */
 var createUrlBuilder = function (host) {
-  // fill in ...
-
-  var builder = function () {}
-
+  // let url = "https://example.com/hello?foo=1&bar=2";
+  var getQueryStr = query => Object.entries(query).map(entArr => entArr.join("=")).join('&');
+  var builder = function ({ query, path }) {
+    return `${builder.path(path)}?${getQueryStr(query)}`
+  }
+  builder.path = path => `${host}/${path}`
+  builder.query = query => {
+    return `${host}?${getQueryStr(query)}`
+  }
   return builder;
 };
-
-
 module.exports = {
   UrlParser,
   createUrlBuilder,
